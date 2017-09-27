@@ -1,0 +1,58 @@
+<%
+  cloudName = "someCloud"
+%>
+driver:
+  name: vagrant
+  provision: true
+  cachier: true
+  customize:
+    memory: 2048
+    cpuexecutioncap: 70
+platforms:
+  - name: centos-7.2
+provisioner:
+  name: chef_solo
+  script: "bootstrap.sh"
+  cookbook_files_glob: "**/*"
+  require_chef_omnibus: 11.18.12
+  solo_rb:
+    verify_api_cert: true
+    ssl_verify_mode: :verify_peer
+    log_level: :info
+suites:
+#------------------------------------------------------------------------------------------------------------------------------------------------------
+  - name: log
+    run_list:
+      - recipe[kitchen-test-helper]
+      - recipe[logstash::add]
+    veridier:
+      inspec_tests:
+        - test/integration/log/serverspec/
+    attributes:
+      logstash:
+        version: "1.5.3"
+      workorder:
+        services:
+          mirror:
+            <%= cloudName %>:
+              ciAttributes:
+                mirrors: "{\n              \"logstash\":\"https://download.elastic.co/logstash/logstash/\"\n}"
+
+        cloud:
+          ciName: <%= cloudName %>
+        box:
+          ciAttributes:
+            availability: ""
+        payLoad:
+          RequiresComputes: ""
+        rfcCi:
+          ciAttributes:
+            inputs: '["  lumberjack {\n","   port => 65555\n","   ssl_certificate => \"testcerts/testcert.crt\"\n","   ssl_key => \"testcerts/testcert.key\"\n","   type => \"somelogs\"\n"]'
+#              [
+#                lumberjack {
+#                    port => 65555
+#                    ssl_certificate => "testcerts/testcert.crt"
+#                    ssl_key => "testcerts/testcert.key"
+#                    type => "somelogs"
+#                }
+#              ]
