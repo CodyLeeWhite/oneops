@@ -15,3 +15,11 @@ Gemfile.lock
 vendor/
 dependency-reduced-pom.xml
 .kitchen/
+oneops-packer/circuits/
+.mvn/repository/
+oneops-admin/.bundle/
+oneops-admin/oneops-admin-adapter-1.0.0.gem
+oneops-admin/oneops-admin-inductor-1.0.0.gem
+oneops-admin/oneops-admin-inductor-az-1.0.0.gem
+oneops-packer/box/
+oneops-packer/centos73-oneops-base-virtualbox-ovf/
