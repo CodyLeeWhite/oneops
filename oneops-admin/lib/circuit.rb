@@ -73,6 +73,7 @@ HELP
     cd_to         = File.expand_path('', File.dirname(__FILE__))
     cookbook_path = options[:cookbook_path]
     cookbook_path = "#{'-o' unless cookbook_path.include?('-o')} #{cookbook_path}" if cookbook_path
+
     %w(classes relations).each do |type|
       run_knife("#{"cd #{cd_to};" if cd_to} knife model sync -a --#{type} #{cookbook_path}")
       wait_for_cache_to_clear

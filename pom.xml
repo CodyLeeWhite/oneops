@@ -19,7 +19,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <skip.unit.tests>false</skip.unit.tests>
+    <skip.unit.tests>true</skip.unit.tests>
     <XmlSchema.version>1.4.7</XmlSchema.version>
     <activemq.version>5.11.1</activemq.version>
     <antlr-runtime.version>3.2</antlr-runtime.version>

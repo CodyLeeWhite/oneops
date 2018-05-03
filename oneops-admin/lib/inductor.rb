@@ -1,5 +1,6 @@
 require 'thor'
 require 'json'
+require 'fileutils'
 
 class Inductor < Thor
   include Thor::Actions
@@ -21,12 +22,34 @@ class Inductor < Thor
     empty_directory "#{options[:path]}/clouds-available"
     empty_directory "#{options[:path]}/clouds-enabled"
     empty_directory "#{options[:path]}/log"
-    empty_directory "#{options[:path]}/shared"
-    directory File.expand_path('shared', File.dirname(__FILE__)), "#{options[:path]}/shared"
+    empty_directory "#{options[:path]}/exec-gems-cache"
+    directory File.expand_path('exec-gems-cache', File.dirname(__FILE__)), "#{options[:path]}/exec-gems-cache"
+
+    # logic for shared in oneops 1
+    if File.exists?('/opt/oneops/circuit-oneops-1/components/shared')
+      if File.symlink?("#{options[:path]}/shared")
+        say_status('exist',"#{options[:path]}/shared")
+      else
+        FileUtils.rm_rf("#{options[:path]}/shared") if Dir.exists?("#{options[:path]}/shared")
+        File.symlink("/opt/oneops/circuit-oneops-1/components/shared","#{options[:path]}/shared")
+        say_status('enable',"#{options[:path]}/shared")
+      end
+      if File.symlink?("#{options[:path]}/circuit-oneops-1/components/shared/exec-order")
+        say_status('exist',"#{options[:path]}/circuit-oneops-1/components/shared/exec-order")
+      else
+        FileUtils.rm_rf("#{options[:path]}/circuit-oneops-1/components/shared/exec-order") if Dir.exists?("#{options[:path]}/circuit-oneops-1/components/shared/exec-order")
+        File.symlink("#{options[:path]}/exec-gems-cache/exec-gems-lib","#{options[:path]}/circuit-oneops-1/components/shared/exec-order")
+        say_status('enable',"#{options[:path]}/circuit-oneops-1/components/shared/exec-order")
+      end
+    else
+      empty_directory "#{options[:path]}/shared"
+      directory File.expand_path('shared', File.dirname(__FILE__)), "#{options[:path]}/shared"
+    end
+    #------------------------------
 
     # local gem repo - remove remote gemrepo dependency and optimize speed
-    empty_directory "#{options[:path]}/shared/cookbooks/vendor"
-    empty_directory "#{options[:path]}/shared/cookbooks/vendor/cache"
+    empty_directory "#{options[:path]}/exec-gems-cache/cookbooks/vendor"
+    empty_directory "#{options[:path]}/exec-gems-cache/cookbooks/vendor/cache"
 
     # chmod exec-order.rb
     `chmod +x #{options[:path]}/shared/exec-order.rb`
@@ -34,9 +57,9 @@ class Inductor < Thor
     if ENV.has_key?("USE_GEM_CACHE")
       gem_paths = `gem env path`.chomp.split(":")
       gem_paths.each do |path|
-        run("cp #{path}/cache/* #{options[:path]}/shared/cookbooks/vendor/cache/")
+        run("cp #{path}/cache/* #{options[:path]}/exec-gems-cache/cookbooks/vendor/cache/")
       end
-      Dir.chdir("#{options[:path]}/shared/cookbooks/vendor/cache/")
+      Dir.chdir("#{options[:path]}/exec-gems-cache/cookbooks/vendor/cache/")
       run("gem generate_index")
     end
 

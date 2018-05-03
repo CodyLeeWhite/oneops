@@ -11,6 +11,8 @@ tar zxf oneops-continuous.tar.gz -C /home/
 azure=${azure_inductor:-false}
 
 mkdir -p /home/oneops/dist/oneops-admin-inductor
+mkdir -p /opt/oneops/
+
 
 if [ "$azure" = "true" ]; then
   tar zxf /home/oneops/dist/oneops-admin-*-inductor-az.tar.gz -C /home/oneops/dist/oneops-admin-inductor
@@ -88,6 +90,7 @@ cd $OO_HOME/dist/oneops-admin-inductor
 # install test-kitchen
 bundle install --gemfile=test-kitchen.gemfile
 
+cp -r /tmp/oneops_circuits/circuit-oneops-1/components/shared /usr/local/share/gems/gems/oneops-admin-adapter-1.0.0/lib/
 mkdir -p /opt/oneops-admin
 cd /opt/oneops-admin
 
